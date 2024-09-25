@@ -12,6 +12,7 @@ namespace SpartaDungeon
     {
         Player player = new Player();
         Store store = new Store();
+        Dungeon dungeon = new Dungeon();
 
         public bool isContinue;
 
@@ -19,7 +20,7 @@ namespace SpartaDungeon
         {
             Console.WriteLine("Sparta Dungeon");
             Console.WriteLine("게임 시작");
-            Console.WriteLine("Press any key to Start.");
+            Console.WriteLine("Press Enter to Start.");
             Console.Write(">> ");
             string? input = Console.ReadLine();
 
@@ -88,19 +89,25 @@ namespace SpartaDungeon
         {
             while (true)
             {
+                player.SetStat();
                 Console.WriteLine("마을에서 다음 활동을 선택할 수 있습니다.");
+                Console.WriteLine();
                 Console.WriteLine("[1] 상태창 보기");
                 Console.WriteLine("[2] 인벤토리 보기");
                 Console.WriteLine("[3] 상점 보기");
                 Console.WriteLine("[4] 휴식하기");
+                Console.WriteLine("[5] 던전 입장");
+                Console.WriteLine();
+                Console.WriteLine("원하는 행동을 입력해주세요.");
                 Console.Write(">> ");
                 string input = Console.ReadLine();
+
 
                 switch (input)
                 {
                     case "1":
                         Console.Clear();
-                        player.ShowStatus(player.equipMainWeapon, player.equipSubWeapon, player.equipArmor);
+                        player.ShowStatus();
                         break;
                     case "2":
                         Console.Clear();
@@ -114,10 +121,14 @@ namespace SpartaDungeon
                         Console.Clear();
                         player.Rest();
                         break;
+                    case "5":
+                        Console.Clear();
+                        dungeon.EnterDungeon(player);
+                        break;
                     default:
                         Console.Clear();
                         Console.WriteLine("잘못된 입력입니다.");
-                        Console.WriteLine("1 ~ 4의 숫자 중에서 하나를 입력해주세요.");
+                        Console.WriteLine("1 ~ 5의 숫자 중에서 하나를 입력해주세요.");
                         Console.WriteLine();
                         break;
                 }

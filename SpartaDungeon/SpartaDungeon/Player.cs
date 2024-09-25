@@ -14,7 +14,6 @@ namespace SpartaDungeon
         int CharacterDefense { get; set; }
         int CharacterMaxHP { get; set; }
         int CurrentHP { get; set; }
-        int Gold { get; set; }
     }
 
     public enum CLASSTYPE
@@ -30,10 +29,13 @@ namespace SpartaDungeon
         public CLASSTYPE ClassType { get; set; }
         public string? CharacterClass { get; set; }
         public int CharacterAttack { get; set; }
+        public int equipItemTotalAtk { get; set; }
         public int TotalAttack { get; set; }
         public int CharacterDefense { get; set; }
+        public int equipItemTotalDef { get; set; }
         public int TotalDefense { get; set; }
         public int CharacterMaxHP { get; set; }
+        public int equipItemTotalHP { get; set; }
         public int TotalMaxHP { get; set; }
         public int CurrentHP { get; set; }
         public int Gold { get; set; }
@@ -44,9 +46,9 @@ namespace SpartaDungeon
         public Item equipArmor = new Item();
 
         public Item warriorBasicMainWeapon = new Item(ITEMTYPE.MainWeapon, "낡은 철검", 300, 3, 0, 0, "녹슬고 무딘 철검", true);
-        public Item mageBasicMainWeapon = new Item(ITEMTYPE.MainWeapon, "낡은 완드", 300, 3, 0, 0, "균열이 있는 완드", true);
-        public Item basicSubWeapon = new Item(ITEMTYPE.SubWeapon, "낡은 단검", 200, 2, 0, 0, "부러질 듯한 단검", true);
-        public Item basicArmor = new Item(ITEMTYPE.Armor, "낡은 갑옷", 300, 0, 3, 10, "녹이 슨 철제갑옷", true);
+        public Item mageBasicMainWeapon    = new Item(ITEMTYPE.MainWeapon, "낡은 완드", 300, 3, 0, 0, "균열이 있는 완드", true);
+        public Item basicSubWeapon         = new Item(ITEMTYPE.SubWeapon,  "낡은 단검", 200, 2, 0, 0, "부러질 듯한 단검", true);
+        public Item basicArmor             = new Item(ITEMTYPE.Armor,      "낡은 갑옷", 300, 0, 3, 10, "녹이 슨 철제갑옷", true);
 
         void PlayerBasicStats()
         {
@@ -155,23 +157,28 @@ namespace SpartaDungeon
             ShowInventory();
         }
 
-        public void ShowStatus(Item equipMainWeapon, Item equipSubWeapon, Item equipArmor)
+        public void SetStat()
+        {
+            equipItemTotalAtk = equipMainWeapon.Atk + equipSubWeapon.Atk + equipArmor.Atk;
+            equipItemTotalDef = equipMainWeapon.Def + equipSubWeapon.Def + equipArmor.Def;
+            equipItemTotalHP = equipMainWeapon.AdditionalHP + equipSubWeapon.AdditionalHP + equipArmor.AdditionalHP;
+            TotalAttack = CharacterAttack + equipItemTotalAtk;
+            TotalDefense = CharacterDefense + equipItemTotalDef;
+            TotalMaxHP = CharacterMaxHP + equipItemTotalHP;
+        }
+
+        public void ShowStatus()
         {
             while (true)
             {
-                int itemTotalAtk = equipMainWeapon.Atk + equipSubWeapon.Atk + equipArmor.Atk;
-                int itemTotalDef = equipMainWeapon.Def + equipSubWeapon.Def + equipArmor.Def;
-                int itemTotalHP = equipMainWeapon.AdditionalHP + equipSubWeapon.AdditionalHP + equipArmor.AdditionalHP;
-                TotalAttack = CharacterAttack + itemTotalAtk;
-                TotalDefense = CharacterDefense + itemTotalDef;
-                TotalMaxHP = CharacterMaxHP + itemTotalHP;
+                SetStat();
 
                 Console.WriteLine("이름\t: " + Name);
                 Console.WriteLine("직업\t: " + CharacterClass);
                 Console.WriteLine("레벨\t: " + Level);
-                Console.WriteLine($"공격력\t: {TotalAttack}[{CharacterAttack} +{itemTotalAtk}]");
-                Console.WriteLine($"방어력\t: {TotalDefense}[{CharacterDefense} +{itemTotalDef}]");
-                Console.WriteLine($"체력\t: {CurrentHP} / {TotalMaxHP}[{CharacterMaxHP} +{itemTotalHP}]");
+                Console.WriteLine($"공격력\t: {TotalAttack}[{CharacterAttack} +{equipItemTotalAtk}]");
+                Console.WriteLine($"방어력\t: {TotalDefense}[{CharacterDefense} +{equipItemTotalDef}]");
+                Console.WriteLine($"체력\t: {CurrentHP} / {TotalMaxHP}[{CharacterMaxHP} +{equipItemTotalHP}]");
                 Console.WriteLine($"소지금\t: {Gold}G");
                 Console.WriteLine();
                 Console.WriteLine("[0] 나가기");

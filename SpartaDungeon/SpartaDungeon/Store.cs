@@ -12,14 +12,14 @@ namespace SpartaDungeon
         public List<Item> MageItemList;
         public List<Item> StoreItemList = new List<Item>();
 
-        Item warriorLegendMainWeapon = new Item(ITEMTYPE.MainWeapon, "전설 소드", 3000, 30, 5, 15, "사용자를 전설로 만들어주는 검", false);
-        Item mageLegendMainWeapon = new Item(ITEMTYPE.MainWeapon, "전설 완드", 3000, 30, 5, 15, "사용자를 전설로 만들어주는 완드", false);
-        Item legendSubWeapon = new Item(ITEMTYPE.SubWeapon, "전설 단검", 2500, 20, 3, 5, "모든 것을 꿰뚫는 전설적인 단검", false);
-        Item legendArmor = new Item(ITEMTYPE.Armor, "전설 아머", 3000, 5, 15, 50, "사용자를 지키는 전설적인 아머", false);
-        Item warriorRareMainWeapon = new Item(ITEMTYPE.MainWeapon, "희귀 소드", 1000, 8, 1, 5, "전설에 가까워지게 하는 검", false);
-        Item mageRareMainWeapon = new Item(ITEMTYPE.MainWeapon, "희귀 완드", 1000, 8, 1, 5, "전설에 가까워지게 하는 완드", false);
-        Item rareSubWeapon = new Item(ITEMTYPE.SubWeapon, "희귀 단검", 700, 5, 1, 0, "근접한 적을 찌르는 숨겨진 비수", false);
-        Item rareArmor = new Item(ITEMTYPE.Armor, "희귀 갑옷", 1000, 0, 8, 20, "쉽게 부서지지 않는 단단한 갑옷", false);
+        Item warriorLegendMainWeapon = new Item(ITEMTYPE.MainWeapon, "전설 소드", 3000, 30, 5, 15, "사용자를 전설로 만들어주는 검",   false);
+        Item mageLegendMainWeapon    = new Item(ITEMTYPE.MainWeapon, "전설 완드", 3000, 30, 5, 15, "사용자를 전설로 만들어주는 완드", false);
+        Item legendSubWeapon         = new Item(ITEMTYPE.SubWeapon,  "전설 단검", 2500, 20, 3, 5,  "모든 것을 꿰뚫는 전설적인 단검",  false);
+        Item legendArmor             = new Item(ITEMTYPE.Armor,      "전설 아머", 3000, 5, 15, 50, "사용자를 지키는 전설적인 아머",   false);
+        Item warriorRareMainWeapon   = new Item(ITEMTYPE.MainWeapon, "희귀 소드", 1000, 8, 1, 5,   "전설에 가까워지게 하는 검",      false);
+        Item mageRareMainWeapon      = new Item(ITEMTYPE.MainWeapon, "희귀 완드", 1000, 8, 1, 5,   "전설에 가까워지게 하는 완드",     false);
+        Item rareSubWeapon           = new Item(ITEMTYPE.SubWeapon,  "희귀 단검", 700,  5, 1, 0,   "근접한 적을 찌르는 숨겨진 비수",  false);
+        Item rareArmor               = new Item(ITEMTYPE.Armor,      "희귀 갑옷", 1000, 0, 8, 20,  "쉽게 부서지지 않는 단단한 갑옷",  false);
 
         public Store()
         {
