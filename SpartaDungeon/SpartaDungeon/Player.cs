@@ -184,6 +184,11 @@ namespace SpartaDungeon
                     Console.Clear();
                     break;
                 }
+                else if (input == "show me the money")
+                {
+                    Console.Clear();
+                    Gold += 10000;
+                }
                 else
                 {
                     Console.Clear();
