@@ -6,23 +6,31 @@ using System.Threading.Tasks;
 
 namespace SpartaDungeon
 {
+    enum DungeonDifficulty
+    {
+        Easy = 1,
+        Normal,
+        Hard
+    }
+
     internal class Dungeon
     {
+        DungeonDifficulty Difficulty { get; set; }
         public int RewardGold { get; set; }
 
-        Random random = new Random();
 
-        public void EnterDungeon(Player player)
+        public void SelectDungeon(Player player)
         {
             while (true)
             {
+                player.SetStat();
                 Console.WriteLine("이곳은 던전 입구입니다. 던전 난이도를 선택하면 해당 던전으로 이동합니다.");
                 Console.WriteLine();
                 Console.WriteLine($"플레이어 현재 체력 : {player.CurrentHP} / {player.TotalMaxHP}");
                 Console.WriteLine();
                 Console.WriteLine("[1] Easy   - 권장 방어력 : 5");
-                Console.WriteLine("[2] Normal - 권장 방어력 : 10");
-                Console.WriteLine("[3] Hard   - 권장 방어력 : 18");
+                Console.WriteLine("[2] Normal - 권장 방어력 : 17");
+                Console.WriteLine("[3] Hard   - 권장 방어력 : 33");
                 Console.WriteLine($"플레이어 현재 방어력 : {player.TotalDefense}");
                 Console.WriteLine();
                 Console.WriteLine("[0] 나가기");
@@ -40,17 +48,20 @@ namespace SpartaDungeon
                     else if (input == "1")
                     {
                         Console.Clear();
-                        EasyDungeon(player);
+                        Difficulty = DungeonDifficulty.Easy;
+                        EnterDungeon(player);
                     }
                     else if (input == "2")
                     {
                         Console.Clear();
-                        NormalDungeon(player);
+                        Difficulty = DungeonDifficulty.Normal;
+                        EnterDungeon(player);
                     }
                     else if (input == "3")
                     {
                         Console.Clear();
-                        HardDungeon(player);
+                        Difficulty = DungeonDifficulty.Hard;
+                        EnterDungeon(player);
                     }
                     else
                     {
@@ -62,31 +73,73 @@ namespace SpartaDungeon
                 else
                 {
                     Console.Clear();
-                    Console.WriteLine("플레이어가 [빈사] 상태입니다. 마을로 돌아가 휴식을 취해주세요.");
+                    Console.WriteLine("플레이어가 [빈사] 상태입니다. 휴식을 취해주세요.");
                     Console.WriteLine();
+                    break;
                 }
             }
         }
 
-        public void EasyDungeon(Player player)
+        public void EnterDungeon(Player player)
         {
-            Console.WriteLine("Easy 던전에 입장하였습니다.");
-            Console.WriteLine("스켈레톤 5마리가 등장합니다.");
+            Console.WriteLine($"{Difficulty} 난이도 던전에 입장했습니다.");
 
             List<Monster> stageMonsterList = new List<Monster>();
-            RewardGold = 500;
-            for (int i = 0; i < 5; i++)
+
+            // 몬스터 생성
+            if (Difficulty == DungeonDifficulty.Easy)
             {
-                int randomLevel = random.Next(1, 4);
-                Monster skeleton = new Monster("스켈레톤 병사", randomLevel,
-                                               3 + randomLevel,
-                                               1 + randomLevel / 2,
-                                               25 + randomLevel * 2,
-                                               200 + randomLevel * 100);
-                stageMonsterList.Add(skeleton);
-                skeleton.ShowMonsterState();
+                Console.WriteLine("던전에 스켈레톤 5마리 존재합니다.");
+                Console.WriteLine();
+
+                RewardGold = 500;
+
+                for (int i = 0; i < 5; i++)
+                {
+                    Monster skeleton = new Monster(MonsterType.Skeleton);
+                    skeleton.MonsterSetStat();
+                    skeleton.ShowMonsterState();
+                    stageMonsterList.Add(skeleton);
+                }
             }
+            else if (Difficulty == DungeonDifficulty.Normal)
+            {
+                Console.WriteLine("던전에 고블린이 5마리 존재합니다.");
+                Console.WriteLine();
+
+                RewardGold = 1000;
+
+                for (int i = 0; i < 5; i++)
+                {
+                    Monster goblin = new Monster(MonsterType.Goblin);
+                    goblin.MonsterSetStat();
+                    goblin.ShowMonsterState();
+                    stageMonsterList.Add(goblin);
+                }
+            }
+            else if (Difficulty == DungeonDifficulty.Hard)
+            {
+                Console.WriteLine("던전에 오크가 5마리 존재합니다.");
+                Console.WriteLine();
+
+                RewardGold = 2000;
+
+                for (int i = 0; i < 5; i++)
+                {
+                    Monster orc = new Monster(MonsterType.Orc);
+                    orc.MonsterSetStat();
+                    orc.ShowMonsterState();
+                    stageMonsterList.Add(orc);
+                }
+            }
+
+            Console.WriteLine();
+            Console.WriteLine("전투를 시작하려면 Enter를 입력해주세요.");
+            Console.Write(">> 전투 시작! ");
+            string battle = Console.ReadLine();
+
             int turn = 0;
+
             while (true)
             {
                 Console.Clear();
@@ -96,203 +149,82 @@ namespace SpartaDungeon
                 bool isPlayerDead = false;
                 int deadCount = 0;
                 int obtainGold = 0;
-                foreach (Monster skeleton in stageMonsterList)
+
+                foreach (Monster monster in stageMonsterList)
                 {
-                    int playersDamage = player.TotalAttack > skeleton.CharacterDefense ? player.TotalAttack - skeleton.CharacterDefense : 1;
-                    int skeletonsDamage = skeleton.CharacterAttack > player.CharacterDefense ? skeleton.CharacterAttack - player.CharacterDefense : 1;
-                    skeleton.CurrentHP -= playersDamage;
-                    player.CurrentHP -= skeletonsDamage;
-                    skeleton.ShowMonsterState();
-                    if (skeleton.IsDead)
+                    int playersDamage = player.TotalAttack > monster.CharacterDefense ?
+                                        player.TotalAttack - monster.CharacterDefense : 1;
+                    int skeletonsDamage = monster.CharacterAttack > player.CharacterDefense ?
+                                          monster.CharacterAttack - player.CharacterDefense : 1;
+                    if (!monster.IsDead)
+                    {
+                        monster.CurrentHP -= playersDamage;
+                        player.CurrentHP -= skeletonsDamage;
+                    }
+                    if (monster.IsDead)
                     {
                         deadCount++;
-                        obtainGold += skeleton.DropGold;
+                        obtainGold += monster.DropGold;
                     }
+
+                    monster.ShowMonsterState();
+
                     if (player.CurrentHP <= 10)
                     {
                         isPlayerDead = true;
                         break;
                     }
                 }
+
                 if (deadCount == stageMonsterList.Count)
                 {
                     player.Gold += obtainGold + RewardGold;
+
+                    Console.Clear();
                     Console.WriteLine($"승리! {obtainGold + RewardGold}G 를 획득했습니다.");
+                    Console.WriteLine($"플레이어 레벨업! Lv.{player.Level} -> Lv.{++player.Level}");
                     Console.WriteLine($"현재 체력은 {player.CurrentHP} / {player.TotalMaxHP} 입니다.");
                     Console.WriteLine();
                     Console.WriteLine("퇴장하려면 Enter를 입력해주세요.");
                     Console.Write(">> ");
                     string? input = Console.ReadLine();
+
                     if (input != null)
                     {
                         Console.Clear();
                         break;
                     }
                 }
-                if (isPlayerDead)
+
+                if (!isPlayerDead)
                 {
-                    Console.Clear();
-                    Console.WriteLine("패배... 플레이어가 빈사상태입니다. 던전 입구로 복귀합니다.");
+                    ++turn;
                     Console.WriteLine();
-                    break;
-                }
-                ++turn;
-                Console.WriteLine();
-                Console.WriteLine($"턴 {turn} 종료! 전투를 계속 진행하려면 Enter를 입력해주세요.");
-                Console.Write(">> ");
-                string? nextTurn = Console.ReadLine();
-            }
-        }
-
-        public void NormalDungeon(Player player)
-        {
-            Console.WriteLine("Easy 던전에 입장하였습니다.");
-            Console.WriteLine("스켈레톤 5마리가 등장합니다.");
-
-            List<Monster> stageMonsterList = new List<Monster>();
-            RewardGold = 500;
-            for (int i = 0; i < 5; i++)
-            {
-                int randomLevel = random.Next(1, 4);
-                Monster skeleton = new Monster("스켈레톤 병사", randomLevel,
-                                               3 + randomLevel,
-                                               1 + randomLevel / 2,
-                                               25 + randomLevel * 2,
-                                               200 + randomLevel * 100);
-                stageMonsterList.Add(skeleton);
-                skeleton.ShowMonsterState();
-            }
-            int turn = 0;
-            while (true)
-            {
-                Console.Clear();
-                Console.WriteLine();
-                Console.WriteLine("[전투 중 ...]");
-
-                bool isPlayerDead = false;
-                int deadCount = 0;
-                int obtainGold = 0;
-                foreach (Monster skeleton in stageMonsterList)
-                {
-                    int playersDamage = player.TotalAttack > skeleton.CharacterDefense ? player.TotalAttack - skeleton.CharacterDefense : 1;
-                    int skeletonsDamage = skeleton.CharacterAttack > player.CharacterDefense ? skeleton.CharacterAttack - player.CharacterDefense : 1;
-                    skeleton.CurrentHP -= playersDamage;
-                    player.CurrentHP -= skeletonsDamage;
-                    skeleton.ShowMonsterState();
-                    if (skeleton.IsDead)
-                    {
-                        deadCount++;
-                        obtainGold += skeleton.DropGold;
-                    }
-                    if (player.CurrentHP <= 10)
-                    {
-                        isPlayerDead = true;
-                        break;
-                    }
-                }
-                if (deadCount == stageMonsterList.Count)
-                {
-                    player.Gold += obtainGold + RewardGold;
-                    Console.WriteLine($"승리! {obtainGold + RewardGold}G 를 획득했습니다.");
-                    Console.WriteLine($"현재 체력은 {player.CurrentHP} / {player.TotalMaxHP} 입니다.");
+                    Console.WriteLine($"플레이어의 현재 체력 : {player.CurrentHP} / {player.TotalMaxHP}");
                     Console.WriteLine();
-                    Console.WriteLine("퇴장하려면 Enter를 입력해주세요.");
+                    Console.WriteLine($"턴 {turn} 종료!");
+                    Console.WriteLine();
+                    Console.WriteLine("[0] 도망가기");
+                    Console.WriteLine("다음 턴을 진행하려면 0 이외의 문자를 입력해주세요.");
+                    Console.WriteLine();
                     Console.Write(">> ");
-                    string? input = Console.ReadLine();
-                    if (input != null)
+                    string input = Console.ReadLine();
+
+                    if (input == "0")
                     {
                         Console.Clear();
+                        Console.WriteLine("도망쳤습니다.");
+                        Console.WriteLine();
                         break;
                     }
                 }
-                if (isPlayerDead)
+                else
                 {
                     Console.Clear();
                     Console.WriteLine("패배... 플레이어가 빈사상태입니다. 던전 입구로 복귀합니다.");
                     Console.WriteLine();
                     break;
                 }
-                ++turn;
-                Console.WriteLine();
-                Console.WriteLine($"턴 {turn} 종료! 전투를 계속 진행하려면 Enter를 입력해주세요.");
-                Console.Write(">> ");
-                string? nextTurn = Console.ReadLine();
-            }
-        }
-
-        public void HardDungeon(Player player)
-        {
-            Console.WriteLine("Easy 던전에 입장하였습니다.");
-            Console.WriteLine("스켈레톤 5마리가 등장합니다.");
-
-            List<Monster> stageMonsterList = new List<Monster>();
-            RewardGold = 500;
-            for (int i = 0; i < 5; i++)
-            {
-                int randomLevel = random.Next(1, 4);
-                Monster skeleton = new Monster("스켈레톤 병사", randomLevel,
-                                               3 + randomLevel,
-                                               1 + randomLevel / 2,
-                                               25 + randomLevel * 2,
-                                               200 + randomLevel * 100);
-                stageMonsterList.Add(skeleton);
-                skeleton.ShowMonsterState();
-            }
-            int turn = 0;
-            while (true)
-            {
-                Console.Clear();
-                Console.WriteLine();
-                Console.WriteLine("[전투 중 ...]");
-
-                bool isPlayerDead = false;
-                int deadCount = 0;
-                int obtainGold = 0;
-                foreach (Monster skeleton in stageMonsterList)
-                {
-                    int playersDamage = player.TotalAttack > skeleton.CharacterDefense ? player.TotalAttack - skeleton.CharacterDefense : 1;
-                    int skeletonsDamage = skeleton.CharacterAttack > player.CharacterDefense ? skeleton.CharacterAttack - player.CharacterDefense : 1;
-                    skeleton.CurrentHP -= playersDamage;
-                    player.CurrentHP -= skeletonsDamage;
-                    skeleton.ShowMonsterState();
-                    if (skeleton.IsDead)
-                    {
-                        deadCount++;
-                        obtainGold += skeleton.DropGold;
-                    }
-                    if (player.CurrentHP <= 10)
-                    {
-                        isPlayerDead = true;
-                        break;
-                    }
-                }
-                if (deadCount == stageMonsterList.Count)
-                {
-                    player.Gold += obtainGold + RewardGold;
-                    Console.WriteLine($"승리! {obtainGold + RewardGold}G 를 획득했습니다.");
-                    Console.WriteLine($"현재 체력은 {player.CurrentHP} / {player.TotalMaxHP} 입니다.");
-                    Console.WriteLine();
-                    Console.WriteLine("퇴장하려면 아무 키나 눌러주세요.");
-                    Console.Write(">> ");
-                    string? input = Console.ReadLine();
-                    if (input != null)
-                    {
-                        Console.Clear();
-                        break;
-                    }
-                }
-                if (isPlayerDead)
-                {
-                    Console.Clear();
-                    Console.WriteLine("패배... 플레이어가 빈사상태입니다. 던전 입구로 복귀합니다.");
-                    Console.WriteLine();
-                    break;
-                }
-                ++turn;
-                Console.WriteLine();
-                Console.WriteLine($"턴 {turn} 종료! 전투를 계속 진행하려면 Enter를 입력해주세요.");
-                Console.Write(">> ");
-                string? nextTurn = Console.ReadLine();
             }
         }
     }

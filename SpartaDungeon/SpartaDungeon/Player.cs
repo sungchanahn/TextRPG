@@ -13,7 +13,7 @@ namespace SpartaDungeon
         int CharacterAttack { get; set; }
         int CharacterDefense { get; set; }
         int CharacterMaxHP { get; set; }
-        int CurrentHP { get; set; }
+        int? CurrentHP { get; set; }
     }
 
     public enum CLASSTYPE
@@ -29,51 +29,29 @@ namespace SpartaDungeon
         public CLASSTYPE ClassType { get; set; }
         public string? CharacterClass { get; set; }
         public int CharacterAttack { get; set; }
-        public int equipItemTotalAtk { get; set; }
+        public int wearItemTotalAtk { get; set; }
         public int TotalAttack { get; set; }
         public int CharacterDefense { get; set; }
-        public int equipItemTotalDef { get; set; }
+        public int wearItemTotalDef { get; set; }
         public int TotalDefense { get; set; }
         public int CharacterMaxHP { get; set; }
-        public int equipItemTotalHP { get; set; }
+        public int wearItemTotalHP { get; set; }
         public int TotalMaxHP { get; set; }
-        public int CurrentHP { get; set; }
-        public int Gold { get; set; }
+        public int? CurrentHP { get; set; }
+        public int? Gold { get; set; }
 
         public List<Item> inventory = new List<Item>();
-        public Item equipMainWeapon = new Item();
-        public Item equipSubWeapon = new Item();
-        public Item equipArmor = new Item();
+        public Item wearMainWeapon = new Item();
+        public Item wearSubWeapon = new Item();
+        public Item wearArmor = new Item();
 
         public Item warriorBasicMainWeapon = new Item(ITEMTYPE.MainWeapon, "낡은 철검", 300, 3, 0, 0, "녹슬고 무딘 철검", true);
         public Item mageBasicMainWeapon    = new Item(ITEMTYPE.MainWeapon, "낡은 완드", 300, 3, 0, 0, "균열이 있는 완드", true);
         public Item basicSubWeapon         = new Item(ITEMTYPE.SubWeapon,  "낡은 단검", 200, 2, 0, 0, "부러질 듯한 단검", true);
         public Item basicArmor             = new Item(ITEMTYPE.Armor,      "낡은 갑옷", 300, 0, 3, 10, "녹이 슨 철제갑옷", true);
 
-        void PlayerBasicStats()
-        {
-            if (ClassType == CLASSTYPE.Warrior)
-            {
-                CharacterClass = "전사";
-                Level = 1;
-                CharacterAttack = 10;
-                CharacterDefense = 5;
-                CharacterMaxHP = 100;
-                CurrentHP = CharacterMaxHP;
-                Gold = 1500;
-            }
-            else if (ClassType == CLASSTYPE.Mage)
-            {
-                CharacterClass = "법사";
-                Level = 1;
-                CharacterAttack = 14;
-                CharacterDefense = 3;
-                CharacterMaxHP = 80;
-                CurrentHP = CharacterMaxHP;
-                Gold = 1500;
-            }
-        }
 
+        // 플레이터 클래스에 따른 기본 장비 인벤토리 추가
         public void SupplyBasicItem()
         {
             if (ClassType == CLASSTYPE.Warrior)
@@ -92,8 +70,10 @@ namespace SpartaDungeon
         {
             while (true)
             {
-                Console.WriteLine("원하는 직업의 숫자를 입력하세요.");
-                Console.WriteLine("[1] 전사\n[2] 법사");
+                Console.WriteLine("원하는 직업의 숫자를 입력하세요.\n");
+                Console.WriteLine("[1] 전사");
+                Console.WriteLine("[2] 법사");
+                Console.WriteLine();
                 Console.Write(">> ");
                 string input = Console.ReadLine();
 
@@ -105,14 +85,17 @@ namespace SpartaDungeon
                             Console.Clear();
                             Console.WriteLine("전사를 선택하셨습니다.");
                             ClassType = CLASSTYPE.Warrior;
+                            Level = 1;
                             break;
                         case "2":
                             Console.Clear();
                             Console.WriteLine("법사를 선택하셨습니다.");
                             ClassType = CLASSTYPE.Mage;
+                            Level = 1;
                             break;
                     }
-                    PlayerBasicStats();
+
+                    SetStat();
                     break;
                 }
                 else
@@ -121,6 +104,7 @@ namespace SpartaDungeon
                     Console.WriteLine("잘못된 입력입니다.");
                 }
             }
+
             TutorialChooseShow();
         }
 
@@ -159,33 +143,60 @@ namespace SpartaDungeon
 
         public void SetStat()
         {
-            equipItemTotalAtk = equipMainWeapon.Atk + equipSubWeapon.Atk + equipArmor.Atk;
-            equipItemTotalDef = equipMainWeapon.Def + equipSubWeapon.Def + equipArmor.Def;
-            equipItemTotalHP = equipMainWeapon.AdditionalHP + equipSubWeapon.AdditionalHP + equipArmor.AdditionalHP;
-            TotalAttack = CharacterAttack + equipItemTotalAtk;
-            TotalDefense = CharacterDefense + equipItemTotalDef;
-            TotalMaxHP = CharacterMaxHP + equipItemTotalHP;
+            if (ClassType == CLASSTYPE.Warrior)
+            {
+                CharacterClass = "전사";
+                CharacterAttack = 6 + Level;
+                CharacterDefense = 3 + Level;
+                CharacterMaxHP = 100 + Level * 10;
+            }
+            else if (ClassType == CLASSTYPE.Mage)
+            {
+                CharacterClass = "법사";
+                CharacterAttack = 12 + Level;
+                CharacterDefense = Level;
+                CharacterMaxHP = 80 + Level * 10;
+            }
+
+            if (Gold == null)
+            {
+                Gold = 1500;
+            }
+            wearItemTotalAtk = wearMainWeapon.Atk + wearSubWeapon.Atk + wearArmor.Atk;
+            wearItemTotalDef = wearMainWeapon.Def + wearSubWeapon.Def + wearArmor.Def;
+            wearItemTotalHP = wearMainWeapon.AdditionalHP + wearSubWeapon.AdditionalHP + wearArmor.AdditionalHP;
+            TotalAttack = CharacterAttack + wearItemTotalAtk;
+            TotalDefense = CharacterDefense + wearItemTotalDef;
+            TotalMaxHP = CharacterMaxHP + wearItemTotalHP;
+
+            if (CurrentHP == null)
+            {
+                CurrentHP = TotalMaxHP;
+            }
+
+            if (CurrentHP < 0)
+            {
+                CurrentHP = 1;
+            }
         }
 
         public void ShowStatus()
         {
             while (true)
             {
-                SetStat();
-
                 Console.WriteLine("이름\t: " + Name);
                 Console.WriteLine("직업\t: " + CharacterClass);
                 Console.WriteLine("레벨\t: " + Level);
-                Console.WriteLine($"공격력\t: {TotalAttack}[{CharacterAttack} +{equipItemTotalAtk}]");
-                Console.WriteLine($"방어력\t: {TotalDefense}[{CharacterDefense} +{equipItemTotalDef}]");
-                Console.WriteLine($"체력\t: {CurrentHP} / {TotalMaxHP}[{CharacterMaxHP} +{equipItemTotalHP}]");
+                Console.WriteLine($"공격력\t: {TotalAttack}[{CharacterAttack} +{wearItemTotalAtk}]");
+                Console.WriteLine($"방어력\t: {TotalDefense}[{CharacterDefense} +{wearItemTotalDef}]");
+                Console.WriteLine($"체력\t: {CurrentHP} / {TotalMaxHP}[{CharacterMaxHP} +{wearItemTotalHP}]");
                 Console.WriteLine($"소지금\t: {Gold}G");
                 Console.WriteLine();
                 Console.WriteLine("[0] 나가기");
                 Console.WriteLine();
-                Console.Write("0을 눌러 나가면 다른 행동을 선택할 수 있습니다.\n>> ");
-
+                Console.Write(">> ");
                 string input = Console.ReadLine();
+
                 if (input == "0")
                 {
                     Console.Clear();
@@ -215,13 +226,13 @@ namespace SpartaDungeon
                 Console.WriteLine("[아이템 목록]");
                 for (int i = 0; i < inventory.Count; i++)
                 {
-                    string itemEquipState = "";
-                    if (inventory[i] == equipMainWeapon || inventory[i] == equipArmor || inventory[i] == equipSubWeapon)
+                    string itemWearState = "";
+                    if (inventory[i] == wearMainWeapon || inventory[i] == wearArmor || inventory[i] == wearSubWeapon)
                     {
-                        itemEquipState = "[E]";
+                        itemWearState = "[E]";
                     }
                     Console.WriteLine("------------------------------------------------------------------------------------------------------------------------");
-                    Console.WriteLine($" [{i + 1}] {itemEquipState}{inventory[i].Name}({inventory[i].ItemTypeKorean})" +
+                    Console.WriteLine($" [{i + 1}] {itemWearState}{inventory[i].Name}({inventory[i].ItemTypeKorean})" +
                                       $" | {inventory[i].Description}" +
                                       $" | 공격력 +{inventory[i].Atk}" +
                                       $" 방어력 +{inventory[i].Def}" +
@@ -247,7 +258,7 @@ namespace SpartaDungeon
                     if (select == 0) break;
                     else if (select > 0 && select <= inventory.Count)
                     {
-                        ManageItemEquip(inventory[select - 1]);
+                        ManageItemWear(inventory[select - 1]);
                         Console.Clear();
                     }
                     else
@@ -269,39 +280,40 @@ namespace SpartaDungeon
             Console.Clear();
         }
 
-        public void ManageItemEquip(Item selectItem)
+        // 아이템 장착 상태가 변할때마다 현재 체력도 변함
+        public void ManageItemWear(Item selectItem)
         {
-            if (selectItem.ItemType == ITEMTYPE.MainWeapon && selectItem != equipMainWeapon)
+            if (selectItem.ItemType == ITEMTYPE.MainWeapon && selectItem != wearMainWeapon)
             {
-                CurrentHP -= equipMainWeapon.AdditionalHP;
-                equipMainWeapon = selectItem;
+                CurrentHP -= wearMainWeapon.AdditionalHP;
+                wearMainWeapon = selectItem;
                 CurrentHP += selectItem.AdditionalHP;
             }
-            else if (selectItem.ItemType == ITEMTYPE.SubWeapon && selectItem != equipSubWeapon)
+            else if (selectItem.ItemType == ITEMTYPE.SubWeapon && selectItem != wearSubWeapon)
             {
-                CurrentHP -= equipSubWeapon.AdditionalHP;
-                equipSubWeapon = selectItem;
+                CurrentHP -= wearSubWeapon.AdditionalHP;
+                wearSubWeapon = selectItem;
                 CurrentHP += selectItem.AdditionalHP;
             }
-            else if (selectItem.ItemType == ITEMTYPE.Armor && selectItem != equipArmor)
+            else if (selectItem.ItemType == ITEMTYPE.Armor && selectItem != wearArmor)
             {
-                CurrentHP -= equipArmor.AdditionalHP;
-                equipArmor = selectItem;
+                CurrentHP -= wearArmor.AdditionalHP;
+                wearArmor = selectItem;
                 CurrentHP += selectItem.AdditionalHP;
             }
-            else if (selectItem == equipMainWeapon)
+            else if (selectItem == wearMainWeapon)
             {
-                equipMainWeapon = new Item();
+                wearMainWeapon = new Item();
                 CurrentHP -= selectItem.AdditionalHP;
             }
-            else if (selectItem == equipSubWeapon)
+            else if (selectItem == wearSubWeapon)
             {
-                equipSubWeapon = new Item();
+                wearSubWeapon = new Item();
                 CurrentHP -= selectItem.AdditionalHP;
             }
-            else if (selectItem == equipArmor)
+            else if (selectItem == wearArmor)
             {
-                equipArmor = new Item();
+                wearArmor = new Item();
                 CurrentHP -= selectItem.AdditionalHP;
             }
         }
@@ -311,6 +323,7 @@ namespace SpartaDungeon
             while (true)
             {
                 Console.WriteLine("여관에서 500G를 내고 휴식을 취해 체력을 회복할 수 있습니다.");
+                Console.WriteLine($"현재 체력: {CurrentHP} / {TotalMaxHP}");
                 Console.WriteLine($"현재 소지금: {Gold}G");
                 Console.WriteLine();
                 Console.WriteLine("[1] 휴식하기");

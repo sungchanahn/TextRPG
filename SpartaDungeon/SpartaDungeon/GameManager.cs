@@ -52,7 +52,7 @@ namespace SpartaDungeon
                 }
             }
             Console.Clear();
-            VillageSceneLoad();
+            VillageScene();
         }
 
         void CheckPlayerName()
@@ -85,11 +85,16 @@ namespace SpartaDungeon
             }
         }
 
-        public void VillageSceneLoad()
+
+        // 메인 화면 무한 루프
+        // 호출된 메서드가 종료되면 돌아와서 반복
+        public void VillageScene()
         {
             while (true)
             {
+                // 메인 화면 올때마다 플레이어 스텟 최신화
                 player.SetStat();
+
                 Console.WriteLine("마을에서 다음 활동을 선택할 수 있습니다.");
                 Console.WriteLine();
                 Console.WriteLine("[1] 상태창 보기");
@@ -98,10 +103,9 @@ namespace SpartaDungeon
                 Console.WriteLine("[4] 휴식하기");
                 Console.WriteLine("[5] 던전 입장");
                 Console.WriteLine();
-                Console.WriteLine("원하는 행동을 입력해주세요.");
+                Console.WriteLine("원하는 활동을 입력해주세요.");
                 Console.Write(">> ");
                 string input = Console.ReadLine();
-
 
                 switch (input)
                 {
@@ -123,7 +127,7 @@ namespace SpartaDungeon
                         break;
                     case "5":
                         Console.Clear();
-                        dungeon.EnterDungeon(player);
+                        dungeon.SelectDungeon(player);
                         break;
                     default:
                         Console.Clear();
