@@ -25,22 +25,18 @@ namespace SpartaDungeon
         // 직업클래스마다 다른 리스트 생성
         public Store()
         {
-            WarriorItemList = new List<Item>();
-            MageItemList = new List<Item>();
-
-            WarriorItemList.Add(warriorLegendMainWeapon);
-            WarriorItemList.Add(legendSubWeapon);
-            WarriorItemList.Add(legendArmor);
-            WarriorItemList.Add(warriorRareMainWeapon);
-            WarriorItemList.Add(rareSubWeapon);
-            WarriorItemList.Add(rareArmor);
-
-            MageItemList.Add(mageLegendMainWeapon);
-            MageItemList.Add(legendSubWeapon);
-            MageItemList.Add(legendArmor);
-            MageItemList.Add(mageRareMainWeapon);
-            MageItemList.Add(rareSubWeapon);
-            MageItemList.Add(rareArmor);
+            WarriorItemList = new List<Item>(10) { warriorLegendMainWeapon ,
+                                                   legendSubWeapon ,
+                                                   legendArmor ,
+                                                   warriorRareMainWeapon ,
+                                                   rareSubWeapon ,
+                                                   rareArmor };
+            MageItemList = new List<Item>(10) { mageLegendMainWeapon ,
+                                                legendSubWeapon ,
+                                                legendArmor ,
+                                                mageRareMainWeapon ,
+                                                rareSubWeapon ,
+                                                rareArmor };
         }
 
         void ShowStoreItemList()
